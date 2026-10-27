@@ -53,7 +53,7 @@ export const signUp = async (req,res) =>{
 
     } catch (error) {
         console.log("Sign Up error");
-        console.log(error);
+        console.log(error.message);
         res.status(500).json({
             message: "Internal Server Error"
         })
@@ -63,8 +63,77 @@ export const signUp = async (req,res) =>{
 
 export const logIn = async (req,res) =>{
 
+    const { password, email } = req.body;
+
+    try {
+
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required"
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if(!user){
+            return res.status(400).json({
+                message:"Email is not registered"
+            })
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+        if(!isPasswordCorrect){
+            return res.status(400).json({
+                message:"Invalid Credentials"
+            })
+        }
+
+    
+        generateToken(user._id,res);
+
+        res.status(200).json({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePic: user.profilePic
+        })
+    }
+        
+
+    catch (error) {
+        console.log("Log In error");
+        console.log(error.message);
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+
 }
 
 export const logOut = async (req,res) =>{
+
+    try {
+        res.cookie("jwt","",{maxAge:0})
+        res.status(200).json({
+            message: "Logged Out Successfully"
+        })
+
+
+        //BETTER METHOD BELOW 
+
+        // res.clearCookie("jwt", {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === "production",
+        //     sameSite: "strict"
+        // });
+
+    } catch (error) {
+        console.log("Log Out error");
+        console.log(error.message);
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
 
 }
