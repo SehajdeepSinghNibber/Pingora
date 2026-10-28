@@ -96,7 +96,6 @@ export const logIn = async (req,res) =>{
             })
         }
 
-    
         generateToken(user._id,res);
 
         res.status(200).json({
@@ -170,6 +169,16 @@ export const updateProfile = async (req,res) => {
         console.log(error.message);
         res.status(500).json({
             message: "Internal Server Error"
+        })
+    }
+}
+
+export const checkAuth = async (req,res) => {
+    try {
+        res.status(200).json(req.user);
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal Server error"
         })
     }
 }
