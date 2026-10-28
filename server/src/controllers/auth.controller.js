@@ -124,8 +124,6 @@ export const logOut = async (req,res) =>{
         res.status(200).json({
             message: "Logged Out Successfully"
         })
-
-
         //BETTER METHOD BELOW 
 
         // res.clearCookie("jwt", {

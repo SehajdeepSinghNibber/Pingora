@@ -6,7 +6,7 @@ const PORT = config.PORT || 5001;
 
 const start = async () => {
     try {
-        connectDB();
+        await connectDB();
         app.listen(PORT,()=>{
             console.log("Server is listening at PORT:",PORT);
         })
