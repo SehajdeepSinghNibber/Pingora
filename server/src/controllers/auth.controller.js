@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/generateJwtAndSetCookies.js";
+import cloudinary from "../lib/cloudinary.js";
 import bcrypt from 'bcryptjs'
 
 export const signUp = async (req,res) =>{
@@ -8,7 +9,13 @@ export const signUp = async (req,res) =>{
 
     try {
 
-        if(!password || password.length < 6){
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                message: "All fields are required"
+            });
+        }
+
+        if(password.length < 6){
             return res.status(400).json({
                 message: "minimum length required for password is 6 characters"
             })
@@ -76,7 +83,7 @@ export const logIn = async (req,res) =>{
         const user = await User.findOne({ email });
 
         if(!user){
-            return res.status(400).json({
+            return res.status(401).json({
                 message:"Email is not registered"
             })
         }
@@ -139,5 +146,30 @@ export const logOut = async (req,res) =>{
 }
 
 export const updateProfile = async (req,res) => {
-    
+    try {
+        
+        const { profilePic } = req.body;
+        const userId = req.user._id;
+
+        if(!profilePic){
+            return res.status(400).json({
+                message: "Profile Pic is Required"
+            })
+        }
+
+        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+        const updateUser = await User.findByIdAndUpdate(userId,{
+            profilePic: uploadResponse.secure_url
+        },{
+            new : true
+        }).select("-password");
+
+        res.status(200).json(updateUser);
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
 }
