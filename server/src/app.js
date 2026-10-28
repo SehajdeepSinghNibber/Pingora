@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.routes.js';
+import messageRouter from './routes/message.Routes.js';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/",(req,res)=>{
     res.send("Server is Online")
 })
 
-app.use('/api/auth',authRouter);
+app.use('/api/auth', authRouter);
+app.use('api/message', messageRouter)
 
 export default app;
